@@ -15,7 +15,7 @@ namespace XDPing
             for (int i = 0; i < args.Length; i++)
             {
                 var arg = args[i].ToLower();
-                if (arg == "-deliverycontroller" || arg == "--deliverycontroller")
+                if (arg == "-deliverycontroller" || arg == "--deliverycontroller" || arg == "/deliverycontroller")
                 {
                     if (args.Length >= i + 2)
                     {
@@ -23,7 +23,7 @@ namespace XDPing
                     }
                 }
 
-                if (arg == "-port" || arg == "--port")
+                if (arg == "-port" || arg == "--port" || arg == "/port")
                 {
                     if (args.Length >= i + 2)
                     {
@@ -35,8 +35,8 @@ namespace XDPing
             if (string.IsNullOrEmpty(deliverycontroller))
             {
                 Console.WriteLine("Valid command line arguments must be supplied:");
-                Console.WriteLine("-deliverycontroller or --deliverycontroller is a required flag. This must be a Delivery Controller or Cloud Connector.");
-                Console.WriteLine("-port or --port is an optional flag. It will default to 80 if not supplied. This is the port the IRegistrar service listens on.");
+                Console.WriteLine("-deliverycontroller, --deliverycontroller or /deliverycontroller is a required flag. This must be followed by the name of a Delivery Controller or Cloud Connector.");
+                Console.WriteLine("-port, --port or /port is an optional flag. It will default to 80 if not supplied. This is the port the Broker's Registrar service listens on.");
                 return -1;
             }
 
@@ -48,7 +48,7 @@ namespace XDPing
         /// <summary>
         /// Performs an XDPing to make sure the Delivery Controller or Cloud Connector is in a healthy state.
         /// It test whether the Broker service is reachable, listening and processing requests on its configured port.
-        /// We do this by issuing a blank HTTP POST requests to the Broker's IRegistrar service.
+        /// We do this by issuing a blank HTTP POST requests to the Broker's Registrar service.
         /// Including "Expect: 100-continue" in the body will ensure we receive a respose of "HTTP/1.1 100 Continue",
         /// which is what we use to verify that it's in a healthy state.
         /// </summary>
@@ -90,7 +90,7 @@ namespace XDPing
                         stringBuilder.AppendLine("- Converting the byte array to a UTF8 string we get the output between the quotes: \"" + strUTF8 + "\"");
                         // Send an additional single byte of 32 (space) as 1 byte with no flags.
                         socket.Send(new byte[1] { (byte)32 }, 1, SocketFlags.None);
-                        stringBuilder.AppendLine("- Sending the following string as a byte to help clear the connection: \"" + BitConverter.ToString(new byte[1] { 32 }) + "\"");
+                        stringBuilder.AppendLine("- Sending the following string as a byte to close the connection: \"" + BitConverter.ToString(new byte[1] { 32 }) + "\"");
                         if (strASCII.Trim().IndexOf("HTTP/1.1 100 Continue", StringComparison.CurrentCultureIgnoreCase) == 0)
                         {
                             listening = true;
